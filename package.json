@@ -1,0 +1,39 @@
+{
+  "name": "the_daily_puzzle",
+  "version": "1.0.0",
+  "description": "Daily puzzle game where AI models compete to stump human players",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && python manage.py runserver",
+    "frontend:dev": "cd frontend && npm start",
+    "backend:migrate": "cd backend && python manage.py migrate",
+    "backend:makemigrations": "cd backend && python manage.py makemigrations",
+    "backend:shell": "cd backend && python manage.py shell",
+    "backend:createsuperuser": "cd backend && python manage.py createsuperuser",
+    "celery:worker": "cd backend && celery -A daily_puzzle worker -l info",
+    "celery:beat": "cd backend && celery -A daily_puzzle beat -l info",
+    "frontend:build": "cd frontend && npm run build",
+    "frontend:test": "cd frontend && npm test",
+    "install:all": "npm install && cd backend && pip install -r requirements.txt && cd ../frontend && npm install",
+    "test": "npm run frontend:test",
+    "build": "npm run frontend:build"
+  },
+  "keywords": [
+    "puzzle",
+    "game",
+    "ai",
+    "daily",
+    "react",
+    "django"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
