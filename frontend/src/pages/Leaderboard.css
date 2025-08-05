@@ -187,38 +187,233 @@
   font-size: 0.95rem;
 }
 
+/* Mobile-optimized leaderboard */
 @media (max-width: 768px) {
   .leaderboard-page {
-    padding: 1rem;
+    padding: 0.5rem;
+  }
+  
+  .leaderboard-container {
+    max-width: 100%;
+  }
+  
+  .leaderboard-header {
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
   }
   
   .leaderboard-header h1 {
     font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .leaderboard-header p {
+    font-size: 1rem;
   }
   
   .tabs {
     flex-direction: column;
     align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
   }
   
   .tab {
-    width: 200px;
+    width: 250px;
     text-align: center;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 25px;
   }
   
-  .table-header, .table-row {
-    grid-template-columns: 60px 1fr 100px 100px;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    font-size: 0.9rem;
+  .leaderboard-content {
+    margin: 0 0.5rem 1.5rem;
+    padding: 1.5rem;
+    border-radius: 16px;
   }
   
-  .leaderboard-content .table-header,
-  .leaderboard-content .table-row {
-    grid-template-columns: 60px 1fr 80px 90px 90px;
+  /* Mobile-friendly card layout instead of table */
+  .leaderboard-table {
+    display: block;
+  }
+  
+  .table-header {
+    display: none; /* Hide header on mobile */
+  }
+  
+  .table-row {
+    display: block;
+    background: #f8f9fa;
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    position: relative;
+  }
+  
+  .table-row.podium {
+    background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, #f8f9fa 100%);
+    border: 2px solid rgba(255,215,0,0.3);
+  }
+  
+  .table-row .col-rank {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+  }
+  
+  .table-row .col-username {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1rem;
+    padding-right: 3rem;
+  }
+  
+  .table-row .col-time,
+  .table-row .col-solved,
+  .table-row .col-avg {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+  
+  .table-row .col-time:before {
+    content: "⏱️ Time: ";
+    color: #666;
+    font-weight: normal;
+    font-family: system-ui;
+  }
+  
+  .table-row .col-solved:before {
+    content: "✅ Solved: ";
+    color: #666;
+    font-weight: normal;
+    font-family: system-ui;
+  }
+  
+  .table-row .col-avg:before {
+    content: "📊 Avg: ";
+    color: #666;
+    font-weight: normal;
+    font-family: system-ui;
+  }
+  
+  .table-row .col-streak,
+  .table-row .col-best {
+    margin-top: 0.75rem;
+  }
+  
+  .streak-badge {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 20px;
   }
   
   .stats-cards {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 0 0.5rem;
+  }
+  
+  .stat-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+    gap: 1.25rem;
+  }
+  
+  .stat-icon {
+    font-size: 3rem;
+  }
+  
+  .stat-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .stat-info p {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .leaderboard-page {
+    padding: 0.25rem;
+  }
+  
+  .leaderboard-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .tab {
+    width: 220px;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+  }
+  
+  .leaderboard-content {
+    margin: 0 0.25rem 1rem;
+    padding: 1.25rem;
+  }
+  
+  .table-row {
+    padding: 1.25rem;
+  }
+  
+  .table-row .col-rank {
+    font-size: 1.3rem;
+  }
+  
+  .table-row .col-username {
+    font-size: 1.2rem;
+  }
+  
+  .table-row .col-time,
+  .table-row .col-solved,
+  .table-row .col-avg {
+    font-size: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+  
+  .stat-icon {
+    font-size: 2.5rem;
+  }
+}
+
+/* Touch interactions */
+@media (hover: none) and (pointer: coarse) {
+  .tab:hover:not(.active) {
+    border-color: #ddd;
+    color: #666;
+  }
+  
+  .tab:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  .table-row:hover {
+    background: #f8f9fa;
+  }
+  
+  .table-row:active {
+    transform: scale(0.99);
+    transition: transform 0.1s ease;
+  }
+  
+  .stat-card:hover {
+    transform: none;
+  }
+  
+  .stat-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
   }
 }
