@@ -23,7 +23,11 @@ services:
       - "8000:8000"
     environment:
       - DEBUG=1
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/daily_puzzle
+      - DB_HOST=db
+      - DB_NAME=daily_puzzle
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_PORT=5432
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       - db
@@ -36,7 +40,11 @@ services:
     command: celery -A daily_puzzle worker -l info
     environment:
       - DEBUG=1
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/daily_puzzle
+      - DB_HOST=db
+      - DB_NAME=daily_puzzle
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_PORT=5432
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       - db
@@ -49,7 +57,11 @@ services:
     command: celery -A daily_puzzle beat -l info
     environment:
       - DEBUG=1
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/daily_puzzle
+      - DB_HOST=db
+      - DB_NAME=daily_puzzle
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_PORT=5432
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       - db

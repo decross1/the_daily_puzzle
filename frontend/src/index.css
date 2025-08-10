@@ -1,54 +1,44 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f5f5;
-  color: #333;
-}
-
+/* Global base styles - minimal to avoid conflicts with App.css */
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+/* Prevent zoom on input focus (iOS Safari) */
+@supports (-webkit-touch-callout: none) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
-.btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  color: white;
+/* Enhanced focus visibility for accessibility */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
+/* Remove focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
 }
 
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
+/* Touch-friendly minimum sizes */
+button, 
+input, 
+select, 
+textarea {
+  min-height: 44px;
 }
 
-.btn-secondary:hover {
-  background-color: #545b62;
+/* Prevent horizontal scrolling */
+html, body {
+  overflow-x: hidden;
 }

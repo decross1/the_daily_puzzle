@@ -27,7 +27,7 @@ Update Rule: D = clamp(D ± 0.05)
 
 ### AI Model Competition
 Multiple AI models rotate as puzzle generators:
-- GPT-4o, Claude 3, Gemini (expandable)
+- GPT-5, Claude 4.0, Gemini 2.5 Pro (expandable)
 - Public **Stump Tally** tracks which models best challenge humans
 - Future: Weight rotation based on historical performance
 
@@ -70,7 +70,7 @@ graph TD
   "id": "2025-08-03",
   "category": "math|word|art",
   "difficulty": 0.58,
-  "generator_model": "claude-3",
+  "generator_model": "claude-4",
   "puzzle_content": {
     "question": "Solve for x: 3x² + 7x - 20 = 0",
     "media_url": null,
