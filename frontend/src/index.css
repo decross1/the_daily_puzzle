@@ -1,104 +1,44 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f5f5;
-  color: #333;
-  line-height: 1.6;
-  /* Mobile optimizations */
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
+/* Global base styles - minimal to avoid conflicts with App.css */
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background-color: #545b62;
-}
-
-/* Mobile-first responsive utilities */
-@media (max-width: 768px) {
-  .container {
-    padding: 0 15px;
-  }
-  
-  .btn {
-    padding: 14px 20px;
-    font-size: 17px;
-    min-height: 50px;
-    border-radius: 12px;
-  }
-}
-
-/* Prevent zoom on input focus (iOS) */
+/* Prevent zoom on input focus (iOS Safari) */
 @supports (-webkit-touch-callout: none) {
   input[type="text"],
   input[type="email"],
   input[type="password"],
+  input[type="search"],
   textarea {
     font-size: 16px !important;
   }
 }
 
-/* Smooth scrolling for better mobile experience */
+/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Focus states for accessibility */
-button:focus,
-input:focus,
-textarea:focus,
-select:focus {
-  outline: 2px solid #667eea;
+/* Enhanced focus visibility for accessibility */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
   outline-offset: 2px;
 }
 
-/* Touch-friendly link spacing */
-a {
+/* Remove focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Touch-friendly minimum sizes */
+button, 
+input, 
+select, 
+textarea {
   min-height: 44px;
-  display: inline-flex;
-  align-items: center;
+}
+
+/* Prevent horizontal scrolling */
+html, body {
+  overflow-x: hidden;
 }

@@ -9,7 +9,12 @@ from django.contrib.auth.models import User
 import logging
 
 from .models import Puzzle, PlayerProgress, StumpTally, DifficultyHistory
-# from .serializers import PuzzleSerializer, PlayerProgressSerializer, StumpTallySerializer
+from .serializers import (
+    PuzzleSerializer, PlayerProgressSerializer, StumpTallySerializer, 
+    DifficultyHistorySerializer, LeaderboardSerializer, PuzzleStatsSerializer,
+    PuzzleSubmissionSerializer, PuzzleSubmissionResponseSerializer,
+    PuzzleGenerationRequestSerializer
+)
 # from services.puzzle_generator import PuzzleGenerationService
 
 logger = logging.getLogger(__name__)
@@ -23,20 +28,8 @@ def get_daily_puzzle(request):
         # Find today's puzzle by looking for puzzle with today's date in the ID
         puzzle = Puzzle.objects.get(id=today.strftime('%Y-%m-%d'), is_active=True)
         
-        # For now, return basic puzzle data without serializer
-        puzzle_data = {
-            'id': puzzle.id,
-            'category': puzzle.category,
-            'difficulty': puzzle.difficulty,
-            'generator_model': puzzle.generator_model,
-            'question': puzzle.puzzle_question,
-            'media_url': puzzle.media_url,
-            'total_attempts': puzzle.total_attempts,
-            'solve_rate': puzzle.solve_rate,
-            'created_at': puzzle.created_at,
-        }
-        
-        return Response(puzzle_data)
+        serializer = PuzzleSerializer(puzzle)
+        return Response(serializer.data)
         
     except Puzzle.DoesNotExist:
         # TODO: Try to generate today's puzzle using PuzzleGenerationService
@@ -60,14 +53,14 @@ def submit_puzzle_answer(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    user = request.user
-    submitted_answer = request.data.get('answer', '').strip()
+    # Validate submission data
+    submission_serializer = PuzzleSubmissionSerializer(data=request.data)
+    if not submission_serializer.is_valid():
+        return Response(submission_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    if not submitted_answer:
-        return Response(
-            {'error': 'Answer is required'}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    user = request.user
+    submitted_answer = submission_serializer.validated_data['answer']
+    solve_time = submission_serializer.validated_data.get('solve_time')
     
     # Get or create player progress for this puzzle
     progress, created = PlayerProgress.objects.get_or_create(
@@ -89,8 +82,7 @@ def submit_puzzle_answer(request):
     # Increment attempt count
     progress.attempts += 1
     
-    # Get solve time from request (frontend should track this)
-    solve_time = request.data.get('solve_time')  # seconds
+    # solve_time is already extracted from validated data above
     
     # Check if answer is correct (simple string comparison for now)
     # TODO: Implement more sophisticated answer checking
@@ -114,13 +106,17 @@ def submit_puzzle_answer(request):
     if is_correct:
         update_player_stats(user, puzzle, solve_time)
     
-    return Response({
+    # Use response serializer for consistency
+    response_data = {
         'is_correct': is_correct,
         'attempts': progress.attempts,
         'solved': progress.solved,
         'solve_time': progress.solve_time,
         'message': 'Correct! Well done!' if is_correct else 'Not quite right, try again!'
-    })
+    }
+    
+    response_serializer = PuzzleSubmissionResponseSerializer(response_data)
+    return Response(response_serializer.data)
 
 def update_player_stats(user, puzzle, solve_time):
     """Update player statistics after a correct solve"""
@@ -179,30 +175,23 @@ def get_leaderboard(request):
         for i, user in enumerate(all_time_leaders)
     ]
     
-    return Response({
+    leaderboard_data = {
         'daily_leaderboard': daily_leaders,
         'all_time_leaderboard': all_time_data
-    })
+    }
+    
+    serializer = LeaderboardSerializer(leaderboard_data)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def get_stump_tally(request):
     """Get AI model stump tally"""
-    tallies = StumpTally.objects.all()
-    
-    tally_data = [
-        {
-            'ai_model': tally.ai_model,
-            'category': tally.category,
-            'successful_stumps': tally.successful_stumps,
-            'total_generated': tally.total_generated,
-            'stump_rate': tally.stump_rate,
-            'last_updated': tally.last_updated
-        }
-        for tally in tallies
-    ]
+    tallies = StumpTally.objects.all().order_by('-successful_stumps')
+    serializer = StumpTallySerializer(tallies, many=True)
     
     # Sort by stump_rate in Python since it's a property
-    tally_data.sort(key=lambda x: x['stump_rate'], reverse=True)
+    tally_data = serializer.data
+    tally_data.sort(key=lambda x: x.get('stump_rate', 0), reverse=True)
     
     return Response(tally_data)
 
@@ -242,7 +231,8 @@ def get_player_stats(request):
         'longest_streak': longest_streak,
     }
     
-    return Response(stats_data)
+    serializer = PlayerStatsSerializer(stats_data)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def get_puzzle_history(request):
@@ -283,8 +273,13 @@ def generate_puzzle_manually(request):
             status=status.HTTP_403_FORBIDDEN
         )
     
-    category = request.data.get('category', 'math')
-    difficulty = float(request.data.get('difficulty', 0.5))
+    # Validate request data
+    serializer = PuzzleGenerationRequestSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    category = serializer.validated_data['category']
+    difficulty = serializer.validated_data['difficulty']
     
     # TODO: Implement PuzzleGenerationService
     # For now, return a mock response
@@ -321,13 +316,16 @@ def get_puzzle_stats(request):
             'total_solves': category_puzzles.aggregate(total=Count('successful_solves'))['total'] or 0,
         }
     
-    return Response({
+    stats_data = {
         'total_puzzles': total_puzzles,
         'total_attempts': total_attempts,
         'total_solves': total_solves,
         'overall_solve_rate': total_solves / total_attempts if total_attempts > 0 else 0,
         'category_stats': category_stats
-    })
+    }
+    
+    serializer = PuzzleStatsSerializer(stats_data)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def get_difficulty_history(request):

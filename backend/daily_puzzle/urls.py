@@ -8,9 +8,10 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/puzzles/', include('puzzles.urls')),
+    path('api/', include('puzzles.urls')),
     path('api/users/', include('users.urls')),
     path('api/validators/', include('validators.urls')),
+    path('api-auth/', include('rest_framework.urls')),
 ]
 
 if settings.DEBUG:
