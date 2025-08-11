@@ -84,8 +84,8 @@ function InfoModal({ isOpen, onClose }) {
               successful at challenging human players!
             </p>
             <div className="model-list">
-              <span className="model-tag">Claude-3</span>
-              <span className="model-tag">GPT-4o</span>
+              <span className="model-tag">Claude-4</span>
+              <span className="model-tag">GPT-5</span>
               <span className="model-tag">Gemini</span>
             </div>
           </section>

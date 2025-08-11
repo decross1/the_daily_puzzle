@@ -26,7 +26,7 @@ export const usePuzzle = () => {
         id: new Date().toISOString().split('T')[0], // Today's date
         category: 'math',
         difficulty: 0.58,
-        generator_model: 'claude-3',
+        generator_model: 'claude4',
         question: 'Solve for x: 3x² + 7x - 20 = 0',
         solution: 'x = 5/3 or x = -4',
         media_url: null

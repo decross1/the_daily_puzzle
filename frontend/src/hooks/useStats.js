@@ -23,8 +23,8 @@ export const useStats = () => {
   };
 
   const mockStumpTally = [
-    { model: 'claude-3', stumps: 12, total: 28, rate: 43 },
-    { model: 'gpt4o', stumps: 8, total: 25, rate: 32 },
+    { model: 'claude4', stumps: 12, total: 28, rate: 43 },
+    { model: 'gpt5', stumps: 8, total: 25, rate: 32 },
     { model: 'gemini', stumps: 6, total: 22, rate: 27 }
   ];
 

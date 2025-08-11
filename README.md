@@ -51,7 +51,7 @@ npm run dev
 - **Backend**: Django REST API (localhost:8000)
 - **Database**: PostgreSQL
 - **Workers**: Celery with Redis
-- **AI Models**: GPT-4o, Claude 3, Gemini
+- **AI Models**: GPT-5, Claude-4, Gemini
 
 ## Project Structure
 

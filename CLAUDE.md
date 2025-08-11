@@ -30,7 +30,7 @@ Update Rule: D = clamp(D ± 0.05)
 
 ### AI Model Competition
 Multiple AI models rotate as puzzle generators:
-- GPT-4o, Claude 3, Gemini (expandable architecture)
+- GPT-5, Claude-4, Gemini (expandable architecture)
 - Public **Stump Tally** tracks which models best challenge humans
 - Model performance tracking implemented
 - Future: Weight rotation based on historical performance
@@ -74,7 +74,7 @@ class Puzzle(models.Model):
     id = CharField(primary_key=True)  # "2025-08-10"
     category = CharField(choices=['math', 'word', 'art'])
     difficulty = FloatField(0.0-1.0)
-    generator_model = CharField(choices=['gpt4o', 'claude3', 'gemini'])
+    generator_model = CharField(choices=['gpt5', 'claude4', 'gemini'])
     puzzle_content = JSONField()  # question, media_url, constraints
     solution = TextField()
     generator_solution = TextField()
@@ -215,8 +215,8 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 ### 🚧 IN PROGRESS (Phase 2)
 - [ ] **AI Service Integration** (Next Priority)
   - PuzzleGenerationService implementation
-  - OpenAI GPT-4o integration
-  - Anthropic Claude integration
+  - OpenAI GPT-5 integration
+  - Anthropic Claude-4 integration
   - Google Gemini integration
   - Cross-model validation pipeline
 

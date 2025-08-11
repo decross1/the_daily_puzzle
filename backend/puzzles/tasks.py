@@ -2,9 +2,12 @@ from celery import shared_task
 from django.utils import timezone
 from django.db.models import Q
 import logging
+import asyncio
+import random
+from datetime import date
 
 from .models import Puzzle, PlayerProgress, StumpTally, DifficultyHistory
-# from services.puzzle_generator import PuzzleGenerationService  # Will implement later
+from ai_services.manager import puzzle_service
 
 logger = logging.getLogger(__name__)
 
@@ -15,28 +18,67 @@ def generate_daily_puzzle():
     """
     logger.info("Starting daily puzzle generation...")
     
-    # TODO: Implement PuzzleGenerationService
-    # generator = PuzzleGenerationService()
-    # puzzle = generator.generate_daily_puzzle()
+    today = timezone.now().date()
+    puzzle_id = today.strftime('%Y-%m-%d')
     
-    # For now, return a placeholder
-    logger.info("Puzzle generation service not yet implemented")
-    return "Puzzle generation service not yet implemented"
+    # Check if puzzle already exists
+    if Puzzle.objects.filter(id=puzzle_id).exists():
+        logger.info(f"Puzzle for {puzzle_id} already exists")
+        return f"Puzzle {puzzle_id} already exists"
     
-    # if puzzle:
-    #     logger.info(f"Successfully generated puzzle {puzzle.id} for {puzzle.date}")
-    #     
-    #     # Validate with other models if available
-    #     validation_results = generator.validate_puzzle_with_all_models(puzzle)
-    #     if validation_results:
-    #         puzzle.validator_results = validation_results
-    #         puzzle.save()
-    #         logger.info(f"Validation results saved: {validation_results}")
-    #     
-    #     return f"Generated puzzle {puzzle.id}"
-    # else:
-    #     logger.error("Failed to generate daily puzzle")
-    #     return "Failed to generate puzzle"
+    # Choose a random category for today's puzzle
+    category = random.choice(['math', 'word', 'art'])
+    
+    # Get current difficulty for this category
+    difficulty = get_current_difficulty(category)
+    
+    try:
+        # Generate puzzle using async service
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        puzzle_data = loop.run_until_complete(
+            puzzle_service.generate_daily_puzzle(today, category, difficulty)
+        )
+        
+        # Create puzzle in database
+        puzzle = Puzzle.objects.create(
+            id=puzzle_data['id'],
+            category=puzzle_data['category'],
+            difficulty=puzzle_data['difficulty'],
+            generator_model=puzzle_data['generator_model'],
+            puzzle_content={
+                'question': puzzle_data['question'],
+                'media_url': puzzle_data.get('media_url'),
+                'hints': puzzle_data.get('hints', []),
+                'estimated_solve_time': puzzle_data.get('estimated_solve_time', 180)
+            },
+            solution=puzzle_data['solution'],
+            generator_solution=puzzle_data.get('explanation', ''),
+            validator_results=puzzle_data.get('validator_results', {}),
+            is_active=True
+        )
+        
+        logger.info(f"Successfully generated puzzle {puzzle.id} by {puzzle.generator_model}")
+        return f"Generated puzzle {puzzle.id}"
+        
+    except Exception as e:
+        logger.error(f"Failed to generate daily puzzle: {str(e)}")
+        return f"Failed to generate puzzle: {str(e)}"
+    finally:
+        loop.close()
+
+
+def get_current_difficulty(category: str) -> float:
+    """Get the current difficulty level for a category"""
+    
+    # Try to get the most recent difficulty from DifficultyHistory
+    latest_history = DifficultyHistory.objects.filter(category=category).first()
+    if latest_history:
+        return latest_history.difficulty
+    
+    # Default to mid-level difficulty
+    return 0.5
 
 @shared_task
 def evaluate_daily_results():

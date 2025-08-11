@@ -32,8 +32,7 @@ def get_daily_puzzle(request):
         return Response(serializer.data)
         
     except Puzzle.DoesNotExist:
-        # TODO: Try to generate today's puzzle using PuzzleGenerationService
-        # For now, return an error
+        logger.warning(f"No puzzle found for {today.strftime('%Y-%m-%d')}")
         return Response(
             {'error': 'No puzzle found for today. Puzzle generation not yet implemented.'}, 
             status=status.HTTP_404_NOT_FOUND

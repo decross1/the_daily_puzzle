@@ -136,7 +136,7 @@ GOOGLE_API_KEY = config('GOOGLE_API_KEY', default='')
 
 # Puzzle Configuration
 PUZZLE_CATEGORIES = ['math', 'word', 'art']
-AI_MODELS = ['gpt4o', 'claude3', 'gemini']
+AI_MODELS = ['gpt5', 'claude4', 'gemini']
 DIFFICULTY_ADJUSTMENT_STEP = 0.05
 DIFFICULTY_MIN = 0.00
 DIFFICULTY_MAX = 1.00

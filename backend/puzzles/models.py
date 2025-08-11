@@ -12,8 +12,8 @@ class Puzzle(models.Model):
     ]
     
     AI_MODEL_CHOICES = [
-        ('gpt4o', 'GPT-4o'),
-        ('claude3', 'Claude 3'),
+        ('gpt5', 'GPT-5'),
+        ('claude4', 'Claude-4'),
         ('gemini', 'Gemini'),
     ]
 
