@@ -6,12 +6,23 @@ node_modules/
 build/
 dist/
 
-# Environment variables
+# Environment variables - NEVER COMMIT THESE!
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+*.env
+backend/.env
+frontend/.env
+**/.env
+**/*.env
+
+# API Keys and Secrets - EXTRA PROTECTION
+**/api_keys.txt
+**/secrets.txt
+**/*secret*
+**/*key*
+**/*token*
+.anthropic
+.openai
 
 # Database
 *.db

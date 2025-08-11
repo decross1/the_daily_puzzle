@@ -80,6 +80,6 @@ class BasePuzzleGenerator(ABC):
         contexts = {
             'math': "Focus on algebra, geometry, number theory, or applied mathematics. Ensure solutions are precise and verifiable.",
             'word': "Create wordplay, riddles, anagrams, or language puzzles. Solutions should be clever but unambiguous.", 
-            'art': "Design visual, musical, or creative challenges. Include clear criteria for correct answers."
+            'art': "Create puzzles about visual arts, music, film, architecture, or cultural knowledge. Examples: artist identification, art movement recognition, color theory, famous works, film/music trivia, architectural styles. Ensure answers are factual and verifiable."
         }
         return contexts.get(category, "General puzzle")

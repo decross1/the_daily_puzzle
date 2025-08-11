@@ -15,9 +15,16 @@ class Claude4PuzzleGenerator(BasePuzzleGenerator):
         self.base_url = "https://api.anthropic.com/v1/messages"
         self.model = "claude-3-5-sonnet-20241022"  # Using latest available Claude model
         
-        self.mock_mode = not self.api_key
+        # Security: Never log the actual API key
+        self.mock_mode = not self.api_key or not self.api_key.startswith('sk-ant-')
         if self.mock_mode:
-            self.logger.warning("ANTHROPIC_API_KEY not configured - running in mock mode")
+            if not self.api_key:
+                self.logger.warning("ANTHROPIC_API_KEY not configured - running in mock mode")
+            else:
+                self.logger.warning("Invalid ANTHROPIC_API_KEY format - running in mock mode")
+        else:
+            # Only log that key is configured, never the actual key
+            self.logger.info(f"Claude-4 initialized with API key (ends with ...{self.api_key[-8:]})")
     
     async def generate_puzzle(
         self, 
@@ -98,33 +105,64 @@ class Claude4PuzzleGenerator(BasePuzzleGenerator):
         difficulty_desc = self.get_difficulty_prompt(difficulty)
         category_context = self.get_category_context(category)
         
-        prompt = f"""
-        You are an expert puzzle creator for "The Daily Puzzle" game. Generate a {category} puzzle with {difficulty_desc}.
-        
-        Context: {category_context}
-        
-        Requirements:
-        - Create an engaging, fair puzzle appropriate for the difficulty level
-        - Ensure there is exactly one correct answer
-        - Make the puzzle solvable within 5 minutes for someone with appropriate skill level
-        - Avoid culturally specific references that might confuse international users
-        - For math: Show clear problem setup, avoid trick questions
-        - For word: Ensure wordplay is clever but not obscure
-        - For art: Describe any visual elements clearly
-        
-        Respond in this exact JSON format:
-        {{
-            "question": "The puzzle question/prompt",
-            "solution": "The exact correct answer", 
-            "explanation": "Clear explanation of how to solve it",
-            "hints": ["optional hint 1", "optional hint 2"],
-            "media_url": null,
-            "estimated_solve_time": 180,
-            "difficulty_justification": "Why this matches the requested difficulty"
-        }}
-        
-        Generate a high-quality puzzle now:
-        """
+        if category == 'art':
+            prompt = f"""
+            You are an expert puzzle creator for "The Daily Puzzle" game specializing in art, culture, and creative puzzles. Generate an {category} puzzle with {difficulty_desc}.
+            
+            Art Puzzle Guidelines:
+            - Focus on visual arts, music, film, architecture, or cultural knowledge
+            - Examples: "Which artist painted 'Starry Night'?", "What art movement emphasized geometric shapes and multiple perspectives?", "This architectural style features flying buttresses and pointed arches - what is it?"
+            - Use universally recognized works, artists, and concepts
+            - Ensure the answer is a specific, verifiable fact
+            - For {difficulty_desc}: {"Choose well-known classics" if difficulty < 0.4 else "Include more specific art knowledge" if difficulty < 0.7 else "Require deeper expertise in art history/theory"}
+            
+            Specific Requirements for Art Puzzles:
+            - Question should test knowledge, not guessing
+            - Answer must be factually correct and unambiguous  
+            - Include context clues in the question when needed
+            - Avoid questions requiring visual recognition of specific images (since no media is provided)
+            - Focus on describable characteristics, historical facts, or well-known associations
+            
+            Respond in this exact JSON format:
+            {{
+                "question": "The puzzle question/prompt about art, music, film, or culture",
+                "solution": "The exact correct answer (artist name, movement, technique, etc.)", 
+                "explanation": "Clear explanation with context about why this is the answer",
+                "hints": ["helpful clue 1", "helpful clue 2"],
+                "media_url": null,
+                "estimated_solve_time": {int(120 + (difficulty * 120))},
+                "difficulty_justification": "Why this matches {difficulty_desc} - explain the knowledge level required"
+            }}
+            
+            Generate a high-quality art puzzle now:
+            """
+        else:
+            prompt = f"""
+            You are an expert puzzle creator for "The Daily Puzzle" game. Generate a {category} puzzle with {difficulty_desc}.
+            
+            Context: {category_context}
+            
+            Requirements:
+            - Create an engaging, fair puzzle appropriate for the difficulty level
+            - Ensure there is exactly one correct answer
+            - Make the puzzle solvable within 5 minutes for someone with appropriate skill level
+            - Avoid culturally specific references that might confuse international users
+            - For math: Show clear problem setup, avoid trick questions
+            - For word: Ensure wordplay is clever but not obscure
+            
+            Respond in this exact JSON format:
+            {{
+                "question": "The puzzle question/prompt",
+                "solution": "The exact correct answer", 
+                "explanation": "Clear explanation of how to solve it",
+                "hints": ["optional hint 1", "optional hint 2"],
+                "media_url": null,
+                "estimated_solve_time": 180,
+                "difficulty_justification": "Why this matches the requested difficulty"
+            }}
+            
+            Generate a high-quality puzzle now:
+            """
         
         if constraints:
             prompt += f"\n\nAdditional Constraints: {json.dumps(constraints)}"
