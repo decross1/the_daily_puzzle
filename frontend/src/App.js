@@ -1,35 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PuzzleGame from './components/PuzzleGame';
 import StatsModal from './components/StatsModal';
 import InfoModal from './components/InfoModal';
+import { usePuzzle } from './hooks/usePuzzle';
 import './App.css';
 
 function App() {
   const [showStats, setShowStats] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-  const [puzzle, setPuzzle] = useState(null);
-  const [gameState, setGameState] = useState('playing'); // playing, solved, failed
-  const [userAnswer, setUserAnswer] = useState('');
-
-  // Mock puzzle data - will be replaced with API call
-  useEffect(() => {
-    setPuzzle({
-      id: '2025-08-10',
-      category: 'math',
-      difficulty: 0.58,
-      generator_model: 'claude-3',
-      question: 'Solve for x: 3x² + 7x - 20 = 0',
-      solution: 'x = 5/3 or x = -4',
-      media_url: null
-    });
-  }, []);
-
-  const handleSubmitAnswer = (answer) => {
-    setUserAnswer(answer);
-    // Mock validation - will be replaced with API call
-    const isCorrect = answer.toLowerCase().includes('5/3') && answer.toLowerCase().includes('-4');
-    setGameState(isCorrect ? 'solved' : 'failed');
-  };
+  const { puzzle, loading, error, gameState, userAnswer, submitAnswer } = usePuzzle();
 
   const getDifficultyTier = (difficulty) => {
     if (difficulty < 0.4) return { label: 'Mini', color: '#28a745' };
@@ -37,11 +16,28 @@ function App() {
     return { label: 'Beast', color: '#dc3545' };
   };
 
-  if (!puzzle) {
+  if (loading) {
     return (
       <div className="app-loading">
         <div className="loading-spinner"></div>
         <p>Loading today's puzzle...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="app-loading">
+        <p>Error: {error}</p>
+        <p>Using sample puzzle for development.</p>
+      </div>
+    );
+  }
+
+  if (!puzzle) {
+    return (
+      <div className="app-loading">
+        <p>No puzzle available today.</p>
       </div>
     );
   }
@@ -94,8 +90,21 @@ function App() {
           puzzle={puzzle}
           gameState={gameState}
           userAnswer={userAnswer}
-          onSubmitAnswer={handleSubmitAnswer}
+          onSubmitAnswer={submitAnswer}
         />
+        
+        {process.env.NODE_ENV === 'development' && (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '1rem', 
+            color: '#6b7280', 
+            fontSize: '0.875rem',
+            borderTop: '1px solid #e5e5e5',
+            marginTop: '2rem'
+          }}>
+            🔧 Development Mode: Using sample puzzle data until AI generation is implemented
+          </div>
+        )}
       </main>
 
       {showStats && (

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useCountdown } from '../hooks/useCountdown';
 import './PuzzleGame.css';
 
 function PuzzleGame({ puzzle, gameState, userAnswer, onSubmitAnswer }) {
   const [currentAnswer, setCurrentAnswer] = useState('');
+  const countdown = useCountdown();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -99,7 +101,7 @@ function PuzzleGame({ puzzle, gameState, userAnswer, onSubmitAnswer }) {
 
           <div className="next-puzzle-info">
             <p className="next-puzzle-text">
-              Next puzzle in: <span className="countdown">23:42:15</span>
+              Next puzzle in: <span className="countdown">{countdown}</span>
             </p>
           </div>
         </div>
