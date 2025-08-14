@@ -1,0 +1,27 @@
+
+        <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+            <title>Interactive Color Wheel</title>
+            
+            <!-- Color wheel segments -->
+            <g id="color-wheel" transform="translate(400,300)">
+                <!-- Primary colors -->
+                <path d="M 0,-150 A 150,150 0 0,1 129.9,-75 L 86.6,-50 A 100,100 0 0,0 0,-100 Z" fill="#FF0000" class="primary-color" data-color="red"/>
+                <path d="M 129.9,-75 A 150,150 0 0,1 129.9,75 L 86.6,50 A 100,100 0 0,0 86.6,-50 Z" fill="#0000FF" class="primary-color" data-color="blue"/>
+                <path d="M 129.9,75 A 150,150 0 0,1 0,150 L 0,100 A 100,100 0 0,0 86.6,50 Z" fill="#FFFF00" class="primary-color" data-color="yellow"/>
+                
+                <!-- Secondary colors -->
+                <path d="M 0,150 A 150,150 0 0,1 -129.9,75 L -86.6,50 A 100,100 0 0,0 0,100 Z" fill="#00FF00" class="secondary-color" data-color="green"/>
+                <path d="M -129.9,75 A 150,150 0 0,1 -129.9,-75 L -86.6,-50 A 100,100 0 0,0 -86.6,50 Z" fill="#FF8000" class="secondary-color" data-color="orange"/>
+                <path d="M -129.9,-75 A 150,150 0 0,1 0,-150 L 0,-100 A 100,100 0 0,0 -86.6,-50 Z" fill="#8000FF" class="secondary-color" data-color="purple"/>
+            </g>
+            
+            <!-- Labels -->
+            <text x="400" y="50" text-anchor="middle" class="color-label">Color Wheel</text>
+            
+            <style>
+                .primary-color { stroke: #333; stroke-width: 2; }
+                .secondary-color { stroke: #333; stroke-width: 1; }
+                .color-label { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; }
+            </style>
+        </svg>
+        

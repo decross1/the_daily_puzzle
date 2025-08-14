@@ -198,15 +198,21 @@ def adjust_difficulty(category, community_solved):
     if latest_history:
         current_difficulty = latest_history.difficulty
     
-    # Adjust difficulty based on community performance
-    if community_solved:
-        # Make it harder
-        new_difficulty = min(1.0, current_difficulty + 0.05)
-        adjustment_reason = "Community solved - increased difficulty"
+    # Enhanced difficulty adjustment for art puzzles using solve rate
+    if category == 'art':
+        new_difficulty, adjustment_reason = adjust_art_difficulty_with_feedback(
+            current_difficulty, community_solved
+        )
     else:
-        # Make it easier
-        new_difficulty = max(0.0, current_difficulty - 0.05)
-        adjustment_reason = "Community stumped - decreased difficulty"
+        # Standard difficulty adjustment for math/word puzzles
+        if community_solved:
+            # Make it harder
+            new_difficulty = min(1.0, current_difficulty + 0.05)
+            adjustment_reason = "Community solved - increased difficulty"
+        else:
+            # Make it easier
+            new_difficulty = max(0.0, current_difficulty - 0.05)
+            adjustment_reason = "Community stumped - decreased difficulty"
     
     # Save the difficulty adjustment
     DifficultyHistory.objects.create(
@@ -219,3 +225,43 @@ def adjust_difficulty(category, community_solved):
     
     logger.info(f"Adjusted {category} difficulty from {current_difficulty} to {new_difficulty}: {adjustment_reason}")
     return new_difficulty
+
+
+def adjust_art_difficulty_with_feedback(current_difficulty, community_solved):
+    """Enhanced difficulty adjustment for art puzzles using sophisticated feedback"""
+    
+    # TODO: Get actual solve rate data from puzzle statistics
+    # For now, use community_solved as a proxy
+    estimated_solve_rate = 0.6 if community_solved else 0.2
+    
+    # Use our sophisticated difficulty calibrator's feedback mechanism
+    from ai_services.difficulty_framework import ArtDifficultyCalibrator
+    
+    calibrator = ArtDifficultyCalibrator()
+    
+    # Generate current difficulty factors
+    current_factors = calibrator.generate_difficulty_factors(current_difficulty)
+    
+    # Adjust factors based on solve rate feedback
+    adjusted_factors = calibrator.adjust_for_performance(current_factors, estimated_solve_rate)
+    
+    # Calculate new difficulty
+    new_difficulty = adjusted_factors.calculate_composite_difficulty()
+    
+    # Ensure reasonable bounds and incremental changes
+    max_change = 0.1  # Limit dramatic swings
+    if abs(new_difficulty - current_difficulty) > max_change:
+        if new_difficulty > current_difficulty:
+            new_difficulty = current_difficulty + max_change
+        else:
+            new_difficulty = current_difficulty - max_change
+    
+    # Determine adjustment reason
+    if estimated_solve_rate > 0.7:
+        reason = f"High solve rate ({estimated_solve_rate:.1%}) - increased difficulty via sophisticated calibration"
+    elif estimated_solve_rate < 0.3:
+        reason = f"Low solve rate ({estimated_solve_rate:.1%}) - decreased difficulty via sophisticated calibration"
+    else:
+        reason = f"Moderate solve rate ({estimated_solve_rate:.1%}) - minor difficulty adjustment"
+    
+    return new_difficulty, reason

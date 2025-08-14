@@ -67,6 +67,66 @@
   margin: 0;
 }
 
+/* Visual Content */
+.visual-content-container {
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.visual-content svg {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Answer Section */
+.answer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+/* Choice Grid */
+.choice-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.choice-btn {
+  padding: 1rem 1.5rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  text-align: left;
+  color: #1e293b;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.choice-btn:hover {
+  border-color: #3b82f6;
+  background: #f8faff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.choice-btn.selected {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
 /* Answer Form */
 .answer-form {
   display: flex;
@@ -287,6 +347,19 @@
     font-size: 1.125rem;
   }
   
+  .choice-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .choice-btn {
+    padding: 1.25rem 1.5rem;
+  }
+  
+  .visual-content-container {
+    padding: 2rem;
+  }
+  
   .result-container {
     padding: 3rem;
   }
@@ -313,7 +386,40 @@
     background-color: #10b981;
   }
   
+  .choice-btn:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: #e2e8f0;
+    background: white;
+  }
+  
+  .choice-btn:active {
+    background: #f8faff;
+    border-color: #3b82f6;
+  }
+  
   .icon-button:hover {
     background-color: transparent;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 480px) {
+  .visual-content-container {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .choice-btn {
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .question-card {
+    padding: 1.5rem;
+  }
+  
+  .question-text {
+    font-size: 1rem;
   }
 }

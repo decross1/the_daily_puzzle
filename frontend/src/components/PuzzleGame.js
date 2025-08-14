@@ -31,6 +31,14 @@ function PuzzleGame({ puzzle, gameState, userAnswer, onSubmitAnswer }) {
 
       <div className="question-container">
         <div className="question-card">
+          {puzzle.visual_content && (
+            <div className="visual-content-container">
+              <div 
+                className="visual-content" 
+                dangerouslySetInnerHTML={{ __html: puzzle.visual_content }}
+              />
+            </div>
+          )}
           {puzzle.media_url && (
             <div className="media-container">
               <img src={puzzle.media_url} alt="Puzzle media" className="puzzle-media" />
@@ -41,26 +49,51 @@ function PuzzleGame({ puzzle, gameState, userAnswer, onSubmitAnswer }) {
       </div>
 
       {gameState === 'playing' && (
-        <form onSubmit={handleSubmit} className="answer-form">
-          <div className="input-container">
-            <input
-              type="text"
-              value={currentAnswer}
-              onChange={(e) => setCurrentAnswer(e.target.value)}
-              placeholder="Enter your answer..."
-              className="answer-input"
-              autoFocus
-              maxLength={200}
-            />
-          </div>
-          <button 
-            type="submit" 
-            className="submit-button"
-            disabled={!currentAnswer.trim()}
-          >
-            Submit
-          </button>
-        </form>
+        <div className="answer-section">
+          {puzzle.interaction_type === 'multiple_choice' && puzzle.options ? (
+            <div className="choice-grid">
+              {puzzle.options.map((option, index) => (
+                <button
+                  key={index}
+                  className={`choice-btn ${currentAnswer === option ? 'selected' : ''}`}
+                  onClick={() => setCurrentAnswer(option)}
+                  type="button"
+                >
+                  {option}
+                </button>
+              ))}
+              <button 
+                className="submit-button"
+                onClick={() => onSubmitAnswer(currentAnswer)}
+                disabled={!currentAnswer}
+                type="button"
+              >
+                Submit Answer
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="answer-form">
+              <div className="input-container">
+                <input
+                  type="text"
+                  value={currentAnswer}
+                  onChange={(e) => setCurrentAnswer(e.target.value)}
+                  placeholder="Enter your answer..."
+                  className="answer-input"
+                  autoFocus
+                  maxLength={200}
+                />
+              </div>
+              <button 
+                type="submit" 
+                className="submit-button"
+                disabled={!currentAnswer.trim()}
+              >
+                Submit
+              </button>
+            </form>
+          )}
+        </div>
       )}
 
       {gameState !== 'playing' && (

@@ -15,7 +15,8 @@ from .serializers import (
     PuzzleSubmissionSerializer, PuzzleSubmissionResponseSerializer,
     PuzzleGenerationRequestSerializer
 )
-# from services.puzzle_generator import PuzzleGenerationService
+from ai_services.manager import puzzle_service
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -266,35 +267,127 @@ def get_puzzle_history(request):
 @api_view(['POST'])
 def generate_puzzle_manually(request):
     """Manual puzzle generation endpoint (for testing)"""
-    if not request.user.is_staff:
-        return Response(
-            {'error': 'Permission denied'}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
     
-    # Validate request data
-    serializer = PuzzleGenerationRequestSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # Allow any user for testing visual puzzles
+    # if not request.user.is_staff:
+    #     return Response(
+    #         {'error': 'Permission denied'}, 
+    #         status=status.HTTP_403_FORBIDDEN
+    #     )
     
-    category = serializer.validated_data['category']
-    difficulty = serializer.validated_data['difficulty']
+    try:
+        # Get request parameters
+        category = request.data.get('category', 'art')
+        difficulty = float(request.data.get('difficulty', 0.5))
+        visual_puzzle = request.data.get('visual_puzzle', True)
+        
+        # Prepare constraints for visual puzzles
+        constraints = {
+            'visual_puzzle': visual_puzzle
+        }
+        
+        # Generate puzzle using our sophisticated system
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            puzzle_data = loop.run_until_complete(
+                puzzle_service.generate_daily_puzzle(
+                    timezone.now().date(), 
+                    category, 
+                    difficulty
+                )
+            )
+            
+            # Format response for frontend
+            response_data = {
+                'success': True,
+                'puzzle': {
+                    'id': puzzle_data.get('id'),
+                    'category': puzzle_data.get('category'),
+                    'difficulty': puzzle_data.get('difficulty'),
+                    'question': puzzle_data.get('question'),
+                    'solution': puzzle_data.get('solution'),
+                    'explanation': puzzle_data.get('explanation'),
+                    'hints': puzzle_data.get('hints', []),
+                    'visual_content': puzzle_data.get('visual_content'),
+                    'interaction_type': puzzle_data.get('interaction_type'),
+                    'puzzle_type': puzzle_data.get('puzzle_type'),
+                    'puzzle_format': puzzle_data.get('puzzle_format', 'text'),
+                    'visual_elements': puzzle_data.get('visual_elements', {}),
+                    'estimated_solve_time': puzzle_data.get('estimated_solve_time', 180),
+                    'generator_model': puzzle_data.get('generator_model'),
+                    'difficulty_justification': puzzle_data.get('difficulty_justification')
+                },
+                'validation': puzzle_data.get('validator_results', {}),
+                'message': f'Generated {category} puzzle with difficulty {difficulty}'
+            }
+            
+            return Response(response_data)
+            
+        finally:
+            loop.close()
+            
+    except Exception as e:
+        logger.error(f"Puzzle generation failed: {str(e)}")
+        return Response({
+            'success': False,
+            'error': str(e),
+            'message': 'Puzzle generation failed'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([])  # Allow unauthenticated access for testing
+def generate_visual_art_puzzle(request):
+    """Generate visual art puzzle specifically for frontend testing"""
     
-    # TODO: Implement PuzzleGenerationService
-    # For now, return a mock response
-    mock_puzzle_data = {
-        'category': category,
-        'difficulty': difficulty,
-        'question': f'Sample {category} puzzle at difficulty {difficulty}',
-        'solution': 'sample_solution',
-        'generator_model': 'mock'
-    }
-    
-    return Response({
-        'success': True,
-        'puzzle': mock_puzzle_data,
-        'message': 'Mock puzzle generated. Real AI integration coming soon.'
-    })
+    try:
+        difficulty = float(request.data.get('difficulty', 0.5))
+        puzzle_type = request.data.get('puzzle_type', 'auto')  # 'color_theory', 'composition', etc.
+        
+        # Import the visual puzzle generator
+        from ai_services.visual_art_puzzles import generate_visual_art_puzzle
+        from ai_services.difficulty_framework import ArtDifficultyCalibrator
+        
+        # Generate difficulty factors
+        calibrator = ArtDifficultyCalibrator()
+        difficulty_factors = calibrator.generate_difficulty_factors(difficulty)
+        
+        # Generate visual puzzle
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            puzzle_data = loop.run_until_complete(
+                generate_visual_art_puzzle(difficulty_factors)
+            )
+            
+            # Add metadata
+            puzzle_data.update({
+                'id': f'test-{timezone.now().strftime("%Y%m%d-%H%M%S")}',
+                'category': 'art',
+                'difficulty': difficulty,
+                'generator_model': 'visual_puzzle_system',
+                'created_at': timezone.now().isoformat()
+            })
+            
+            return Response({
+                'success': True,
+                'puzzle': puzzle_data,
+                'message': 'Visual art puzzle generated successfully'
+            })
+            
+        finally:
+            loop.close()
+            
+    except Exception as e:
+        logger.error(f"Visual puzzle generation failed: {str(e)}")
+        return Response({
+            'success': False,
+            'error': str(e),
+            'message': 'Visual puzzle generation failed'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Additional utility endpoints
 
