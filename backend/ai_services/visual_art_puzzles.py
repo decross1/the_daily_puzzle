@@ -392,6 +392,68 @@ class CanvasArtGenerator:
             """
         
         return ""
+    
+    async def generate_chiaroscuro_demo(self, visual_elements: Dict) -> str:
+        """Generate SVG demonstrating chiaroscuro lighting technique"""
+        
+        return f"""
+        <svg width="{self.width}" height="{self.height}" xmlns="http://www.w3.org/2000/svg">
+            <title>Chiaroscuro Lighting Demonstration</title>
+            
+            <!-- Dark background -->
+            <rect width="100%" height="100%" fill="#1a1a1a"/>
+            
+            <!-- Light source (top left) -->
+            <defs>
+                <radialGradient id="lightSource" cx="20%" cy="20%" r="80%">
+                    <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9"/>
+                    <stop offset="30%" style="stop-color:#ffeb3b;stop-opacity:0.6"/>
+                    <stop offset="70%" style="stop-color:#ff9800;stop-opacity:0.3"/>
+                    <stop offset="100%" style="stop-color:#000000;stop-opacity:0.1"/>
+                </radialGradient>
+                
+                <!-- Shadow gradient -->
+                <linearGradient id="shadowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#333333"/>
+                    <stop offset="100%" style="stop-color:#000000"/>
+                </linearGradient>
+            </defs>
+            
+            <!-- Main subject: sphere demonstrating volume -->
+            <circle cx="300" cy="250" r="80" fill="url(#lightSource)" stroke="#444" stroke-width="2"/>
+            
+            <!-- Cast shadow -->
+            <ellipse cx="380" cy="380" rx="60" ry="20" fill="url(#shadowGradient)" opacity="0.8"/>
+            
+            <!-- Secondary object showing strong contrast -->
+            <rect x="500" y="200" width="100" height="150" fill="#f5f5f5" stroke="#333" stroke-width="1"/>
+            <rect x="520" y="220" width="60" height="110" fill="#666" opacity="0.9"/>
+            
+            <!-- Dramatic light beam -->
+            <polygon points="150,100 250,150 320,180 300,250 200,200 120,140" 
+                     fill="url(#lightSource)" opacity="0.4"/>
+            
+            <!-- Title and explanation -->
+            <text x="400" y="50" text-anchor="middle" fill="#ffffff" font-size="24" font-weight="bold">
+                Chiaroscuro: Light and Shadow
+            </text>
+            
+            <text x="400" y="500" text-anchor="middle" fill="#cccccc" font-size="16">
+                Notice the dramatic contrast between light and dark areas
+            </text>
+            
+            <text x="400" y="525" text-anchor="middle" fill="#cccccc" font-size="16">
+                This technique creates volume, drama, and focus
+            </text>
+            
+            <!-- Highlighting key areas -->
+            <circle cx="250" cy="220" r="5" fill="#ff6b35" opacity="0.8"/>
+            <text x="260" y="215" fill="#ff6b35" font-size="12">Highlight</text>
+            
+            <circle cx="380" cy="380" r="5" fill="#ff6b35" opacity="0.8"/>
+            <text x="390" y="375" fill="#ff6b35" font-size="12">Cast Shadow</text>
+        </svg>
+        """
 
 
 # Integration with main puzzle system
@@ -409,9 +471,11 @@ async def generate_visual_art_puzzle(difficulty_factors: ArtDifficultyFactors) -
         visual_content = await canvas_generator.generate_color_wheel(puzzle_spec.visual_elements)
     elif puzzle_spec.puzzle_type == VisualPuzzleType.COMPOSITION:
         visual_content = await canvas_generator.generate_composition_grid(puzzle_spec.visual_elements)
+    elif puzzle_spec.puzzle_type == VisualPuzzleType.GENERATED_ART:
+        visual_content = await canvas_generator.generate_chiaroscuro_demo(puzzle_spec.visual_elements)
     else:
-        # For now, use text-based for complex puzzles
-        visual_content = f"<div>Visual puzzle: {puzzle_spec.image_prompt}</div>"
+        # Fallback: generate a basic composition demonstration
+        visual_content = await canvas_generator.generate_composition_grid(puzzle_spec.visual_elements)
     
     # Return puzzle in expected format
     return {
