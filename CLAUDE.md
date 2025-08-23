@@ -367,3 +367,43 @@ REDIS_URL=redis://redis:6379/0
 - All services operational and ready for extensive UX testing
 
 **Priority**: Achieve NYT-quality art puzzle experience before proceeding to multi-model AI integration
+
+---
+
+## 🚨 CRITICAL DEVELOPMENT REMINDERS
+
+### Always Consider Full Stack Workflow
+**Before making ANY changes, Claude must:**
+1. **Check Docker Status**: `docker-compose ps` - ensure all containers running
+2. **Test Full Pipeline**: Frontend → API → Database → Response
+3. **Verify in Browser**: Actually open http://localhost:3000 and test user experience
+4. **Check Console Errors**: F12 → Console for JavaScript errors
+5. **Test Mobile**: Responsive design on different screen sizes
+
+### Docker-First Development Approach
+```bash
+# Always start here - check container status
+docker-compose ps
+
+# Rebuild if needed (especially after file changes)
+docker-compose up --build
+
+# Check logs for errors
+docker logs daily_puzzle-frontend-1
+docker logs daily_puzzle-backend-1
+
+# Shell into containers for debugging
+docker exec -it daily_puzzle-frontend-1 sh
+docker exec -it daily_puzzle-backend-1 python manage.py shell
+```
+
+### Full Stack Testing Checklist
+- [ ] **Backend API**: Test endpoints with curl
+- [ ] **Database**: Verify data persistence  
+- [ ] **Frontend**: Check React app renders without errors
+- [ ] **Integration**: Test API calls from frontend
+- [ ] **User Experience**: Complete user workflow end-to-end
+- [ ] **Mobile**: Test responsive design
+- [ ] **Error Handling**: Verify graceful fallbacks
+
+**NEVER assume something works without testing the complete user-facing workflow!**
